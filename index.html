@@ -1,0 +1,227 @@
+
+<!DOCTYPE html>
+<html lang="es" ng-app="eventApp">
+<head>
+	<title>Event 1</title>
+	<meta name="description" content="" />
+	<meta name="keywords" content="" />
+	<!-- CSS -->
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=2.0">
+	<meta http-equiv="X-UA-Compatible" content="IE=8"/>
+	<link rel="stylesheet" type="text/css" href="static/bootstrap/dist/css/bootstrap.min.css"/>
+	<link rel="stylesheet" type="text/css" href="static/bootstrap/dist/css/bootstrap-theme.min.css"/>
+    <link href="static/bootstrap/theme.css" rel="stylesheet">
+    
+    <link href="css/style.css" rel="stylesheet">
+    <link rel='stylesheet' media='screen and (max-width: 700px)' href='css/style_min.css' />
+<link rel='stylesheet' media='screen and (min-width: 701px) and (max-width: 900px)' href='css/style_med.css' />
+</head>
+<!------------------------------------------------------>
+
+
+
+<body>
+<div class="container">
+
+<header>
+
+
+	<div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+    	 <div class="navbar-default" role="navigation">
+                   <div>
+                   <div class="navbar-header">
+                     <a class="navbar-brand" href="#"><img class="logo" src="img/logo.jpg"></a>
+                   </div>
+              </div>
+         </div>
+         <!---->
+         <div id="title_event">
+                 <!------------------>
+				<div ng-controller="eventController">
+					<div>
+						<h2>{$ events.title $}</h2><br>
+						<div id="event_data" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+							<span id="fecha" class="badge">{$ events.date_event | date : format : timezone $}</span>
+                            <br>
+                             <span>Num. Reg {$ events.num_registereds $}/{$ events.n_seats $}</span><br/>
+						</div>
+                         <!------------------>
+						<!--<div style="float:left;">
+							<span ng-show="events.is_open"><a href="#" ng-click="setRegisterEvent(events.id, events.title)">Register to this event</a></span>
+							<span id="alert_close" ng-show="!events.is_open" style="background: #f2dede; padding: 3px 19px; border-radius: 5px; font-size:15px;">The event is full</span>
+						</div>-->
+                         <!------------------>
+					</div>
+				</div>
+			</div>
+   	</div>
+    
+    <div class="col-lg-4 col-md-4 visible-lg visible-md hidden-sm hidden-xs pull-right">
+    <img src="img/esquina_incubators.jpg">
+    </div>
+</header>
+<!--------------------------------------------------------------------------------------------------------------------------->
+
+<div class="row" ng-controller="attendeeController">
+	<p class="col-lg-7 col-md-7 col-sm-12 col-xs-12 event-desc pull-left">
+    {$ event.event.description $} 
+    </p>
+    
+    <div id="formulario" class="col-md-3 col-sm-12 col-xs-12 pull-right" >
+				<p>Register</p>
+				<h3> {$ event.event.title || "Event no selected" $}</h3>
+				<form role="form" name="form" class="css-form" novalidate>                    
+					<div class="col-md-12 col-sm-6 col-xs-12 pull-left">
+                    <div class="form-group " >
+						<!--<label for="exampleInputEmail1">Name</label>-->
+						<input type="text" class="form-control" ng-model="attendee.name" name="name" id="name" placeholder="Your name" required>
+					</div>
+                    
+					<div class="form-group">
+						<!--<label for="exampleInputEmail1">Last name</label>-->
+						<input type="text" class="form-control" ng-model="attendee.surname" name="surname" id="surname" placeholder="Your last name" required>
+					</div>
+                   
+                   </div>
+                   
+                   <div class="col-md-12 col-sm-6 col-xs-12 pull-right"> 
+					<div class="form-group ">
+						<!--<label for="exampleInputEmail1">Email</label>-->
+						<input type="email" class="form-control" ng-model="attendee.email" name="email" id="email" placeholder="your-email@example.com" required>
+					</div>
+					<div class="form-group" ng-repeat="question in event.event.questions">
+						<input type="hidden" class="form-control" ng-model="question.id" name="question.id" id="extra_company" value="">
+						<input type="text" class="form-control" ng-model="question.answer" name="question.answer" id="extra_company" placeholder="{$ question.question $}" value="">
+					</div>
+                    </div>
+                    
+					<button type="submit" class="btn btn-lg enviar col-md-12 col-sm-12" ng-click="submit(attendee, events)" ng-disabled="form.$invalid || isUnchanged(attendee)">Register</button>
+					<div ng-show="form.email.$dirty && form.email.$invalid" class="alert alert-danger" role="alert" style="margin-top: 15px;">Invalid:
+						<span ng-show="form.email.$error.required">Tell us your email.</span>
+						<span ng-show="form.email.$error.email">This is not a valid email.</span>
+					</div>
+					<div ng-show="is_sending_register" class="alert alert-success" role="alert" style="margin-top: 15px;">
+						<span >Enviando información. Por favor, espere</span>
+					</div>
+					<div ng-show="finish_sending">
+						<div ng-show="result_register" class="alert alert-success" role="alert" style="margin-top: 15px;">
+							<span >Registro completado correctamente. <a href="http://events-drf.herokuapp.com/invitation/{$ attendee.id $}" >haz click aquí para descargar tu acreditación</a></span>
+						</div>
+						<div ng-show="!result_register" class="alert alert-danger" role="alert" style="margin-top: 15px;">
+							<span >Se produjo el siguiente error: {$ result_error_msg $}</span>
+						</div>
+					</div>
+				</form>
+			</div>
+            
+            
+ <!---------------------------------------------------------------->   
+    
+    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 info-map">
+    	<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <h3>[PLACE]-[BUILDING]</h3>
+        <p><strong class="blue">Date:</strong> [DATE]</p>
+       	<p><strong class="blue">Date:</strong> 09:30h - 12:30h</p>
+        <p><strong class="blue">Place</strong> <a href="#">[BUILDING]</a><br>
+        Rambla del Prat, 27, 08012 Barcelona </p>
+        
+        </div>
+    	<div id="map_canvas" class="mapa col-lg-6 col-md-6 col-sm-6 col-xs-12 pull-right"></div>
+	</div> <!-- fin info-map-->
+
+ <!---------------------------------------------------------------->  
+ 
+ 	<div class="row" id="agenda">
+    	<h3>Agenda</h3>
+        
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" >
+        	<div id="horas_agenda" class="col-xs-3 blue">
+            	<p>09:30h - 10:00h</p>
+                <p>09:30h - 10:00h</p>
+                <p>09:30h - 10:00h</p>
+                
+            
+            </div>
+            
+            <div id="desc_agenda" class="col-xs-8 ">
+            	<p><strong>Registro</strong></p>
+              <p><strong>Introducción y bienvenida</strong>
+Meifang Chen - New Business Acquisition Manager - Google</p>
+				<p><strong>Introducción y bienvenida</strong>
+Meifang Chen - New Business Acquisition Manager - Google</p>
+            
+            </div>
+        </div>
+        <!----------->
+        
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" >
+        	<div id="horas_agenda" class="col-xs-3 blue">
+            	<p>09:30h - 10:00h</p>
+                <p>09:30h - 10:00h</p>
+                <p>09:30h - 10:00h</p>
+                
+            
+            </div>
+            
+            <div id="desc_agenda" class="col-xs-8 ">
+            	<p><strong>Registro</strong></p>
+              <p><strong>Introducción y bienvenida</strong>
+Meifang Chen - New Business Acquisition Manager - Google</p>
+				<p><strong>Introducción y bienvenida</strong>
+Meifang Chen - New Business Acquisition Manager - Google</p>
+            
+            </div>
+        </div>
+        
+       
+    
+    
+    </div>
+    
+<!---------------------------------------------------------------->  
+
+<footer class="col-xs-12">
+		<div class="colores"></div>
+		<!--<p><a href="mailto:aldescubierto@google.com">Contacto</a> - <a href="http://www.google.com/intl/es/policies/privacy/" target="_blank">Términos y condiciones</a></p>-->
+		
+		<p>© 2014 Google Ireland Ltd, Gordon House, Barrow Street, Dublin 4, Ireland.</p>
+
+		<p>Si necesitas información sobre el evento, puedes contactar con nosotros en la dirección <a href="mailto:aldescubierto@google.com">aldescubierto@google.com</a></p>
+		
+		
+</footer>
+
+</div>
+
+</div> <!--FIN CONTAINER-->
+
+<!-- Placed at the end of the document so the pages load faster -->
+	<!-- 
+	<script src="static/jquery/jquery.min.js"></script>
+	<script src="static/bootstrap/dist/js/bootstrap.min.js"></script>
+	 -->
+	<script src="static/angular/angular.js"></script>
+	<script src="static/angular-resource/angular-resource.min.js"></script>
+	<script src="static/angular-route/angular-route.min.js"></script>
+	<script src="static/landing/js/services.js"></script>
+	<script src="static/landing/js/controllers.js"></script>
+	<script src="static/landing/js/app.js"></script>
+    <script type="text/javascript" src="https://maps.google.com/maps/api/js?sensor=false"></script>
+    
+    
+    
+	<script>
+	// Add the CSRF Token
+	//var app = angular.module('example.app'); // Not including a list of dependent modules (2nd parameter to `module`) "re-opens" the module for additional configuration
+	app.config(['$httpProvider', function($httpProvider) {
+		$httpProvider.defaults.headers.common['X-CSRFToken'] = '{{ csrf_token|escapejs }}';
+	}]);
+	</script>
+    
+    <script type="text/javascript">
+
+</script>
+
+</body>
+</html>
