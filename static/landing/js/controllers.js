@@ -12,6 +12,7 @@ angular.module('events', ['eventService'])
             console.log($scope.events);
     	}else{
         	sharedEvent.event = data;
+        	$scope.events = data;
             console.log(sharedEvent.event);
     	}
       }).
