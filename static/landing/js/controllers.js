@@ -1,36 +1,50 @@
-angular.module('events', ['eventService'])
+/**
+ * Module Events: compuesto de 2 controladores.
+ * ngSanitize: https://docs.angularjs.org/api/ngSanitize/service/$sanitize
+ * google-maps: https://angular-ui.github.io/angular-google-maps/
+ * angularUI: http://angular-ui.github.io/
+ * 
+ * Para que funcione este módulo y sus controladores hay que llamarlo desde app.js
+ * */
+
+angular.module('events', ['eventService', 'google-maps','ngSanitize'])
 .controller('eventController', ['$scope','$http', '$log', 'sharedEvent', function ($scope, $http, $log, sharedEvent) {
 	/**
 	 * Inicializar events
 	 */
-	$scope.events = {};
-	$http.get('https://test-django-cloud-sql-1234.appspot.com/api/events/1').
+	//http://dev.gobalo. es:888/
+	//https://test-django-cloud-sql-1234.appspot.com/
+	$scope.event = {};
+	$http.get('http://dev.gobalo.es:888/api/events/1').
     success(function(data, status, headers, config) {
-    	console.log(data.length);
-    	if(data.length > 0 && data.length !== undefined){
-            $scope.events = data;
-            console.log($scope.events);
-    	}else{
-        	sharedEvent.event = data;
-        	$scope.events = data;
-            console.log(sharedEvent.event);
-    	}
-      }).
-      error(function(data, status, headers, config) {
-        console.log(data);
-        console.log(status);
-        console.log(headers);
-        console.log(config);
-      });
+		/* Si se recupera más de un evento se muestran para seleccionar. Si Solo es uno se carga contra el servicio sharedEvent */
+		if(data.length > 0 && data.length !== undefined){
+	        $scope.events = data;
+		}else{
+			coords = data.google_maps_coords.split(',');
+	    	sharedEvent.event = data;
+	    	sharedEvent.map = {center: {latitude: coords[0], longitude: coords[1]}, zoom:15 };
+	    	$scope.event = data;
+		}
+	  }).
+	  error(function(data, status, headers, config) {
+		    console.log(data);
+		    console.log(status);
+		    console.log(headers);
+		    console.log(config);
+		});
+	/*
 	  $scope.setRegisterEvent = function(event) {
 		  sharedEvent.event = event;
 		  console.log(sharedEvent.event);
 	  };
-}]);
-
-angular.module('formAttendee', [])
+	  */
+}])
 .controller('attendeeController', ['$scope','$http', '$log' , 'sharedEvent', function($scope, $http, $log, sharedEvent) {
-	$scope.event= sharedEvent;
+	console.log($scope.event);
+	$scope.event = [];
+	$scope.event = sharedEvent;
+	$scope.event.map = {center: {latitude: '51.219053', longitude: '-4.402323' }, zoom: 5 };
 	/**
 	 * Muestra si hubo un error en el envío(false) o la confirmación (true)
 	 */
@@ -65,18 +79,16 @@ angular.module('formAttendee', [])
     	$scope.attendee.event = $scope.event.event.id;
     	$scope.attendee.answers = [];
     	$scope.event.event.questions.forEach(function(question) {
-    	    console.log(question);
     	    $scope.attendee.answers.push({
     	    	question: question.id,
     	    	answer: question.answer
     	    })
     	});
-    	console.log($scope.attendee);
     	//return false;
     	/**
     	 * Enviamos los datos a la API
     	 */
-    	$http.post('https://test-django-cloud-sql-1234.appspot.com/api/attendees/', $scope.attendee)
+    	$http.post('http://dev.gobalo.es:888/api/attendees/', $scope.attendee)
             .success(function(data) {
             	console.log(data);
             	$scope.is_sending_register = false;

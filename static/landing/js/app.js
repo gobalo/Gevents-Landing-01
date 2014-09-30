@@ -1,4 +1,4 @@
-var app = angular.module('eventApp', ['ngRoute', 'ngResource', 'events', 'formAttendee']);
+var app = angular.module('eventApp', ['ngRoute', 'ngResource', 'events']);
 
 app.config(function($interpolateProvider) {
 	$interpolateProvider.startSymbol('{$');
