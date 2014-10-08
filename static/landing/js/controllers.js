@@ -15,7 +15,7 @@ angular.module('events', ['eventService', 'google-maps','ngSanitize'])
 	//http://dev.gobalo. es:888/
 	//https://test-django-cloud-sql-1234.appspot.com/
 	$scope.event = {};
-	$http.get('http://dev.gobalo.es:888/api/events/1').
+	$http.get('https://test-django-cloud-sql-1234.appspot.com/api/events/1').
     success(function(data, status, headers, config) {
 		/* Si se recupera más de un evento se muestran para seleccionar. Si Solo es uno se carga contra el servicio sharedEvent */
 		if(data.length > 0 && data.length !== undefined){
@@ -25,6 +25,7 @@ angular.module('events', ['eventService', 'google-maps','ngSanitize'])
 	    	sharedEvent.event = data;
 	    	sharedEvent.map = {center: {latitude: coords[0], longitude: coords[1]}, zoom:15 };
 	    	$scope.event = data;
+	    	$('#content_preload').hide()
 		}
 	  }).
 	  error(function(data, status, headers, config) {
@@ -88,7 +89,7 @@ angular.module('events', ['eventService', 'google-maps','ngSanitize'])
     	/**
     	 * Enviamos los datos a la API
     	 */
-    	$http.post('http://dev.gobalo.es:888/api/attendees/', $scope.attendee)
+    	$http.post('https://test-django-cloud-sql-1234.appspot.com/api/attendees/', $scope.attendee)
             .success(function(data) {
             	console.log(data);
             	$scope.is_sending_register = false;
